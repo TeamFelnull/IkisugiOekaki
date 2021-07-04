@@ -9,9 +9,10 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36";
 
     public static boolean stopd;
 
@@ -92,40 +94,38 @@ public class Main {
         }
 */
 
-        File pictuer = new File("D:\\Pictures\\DropBox\\avatar.jpg");
-        URL url = new URL("https://cdn.discordapp.com/attachments/608914022883917824/772354417344774184/unknown.png");
-        if (pictuer.exists()) {
-            try {
-                BufferedImage image = ImageIO.read(url);
-                int size = campush;
-                float w = image.getWidth();
-                float h = image.getHeight();
-                int aw = size;
-                int ah = size;
-                if (w == h) {
-                    aw = size;
-                    ah = size;
-                } else if (w > h) {
-                    aw = size;
-                    ah = (int) ((float) size * (h / w));
-                } else if (w > h) {
-                    aw = (int) ((float) size * (w / h));
-                    ah = size;
-                }
-                BufferedImage reImage = new BufferedImage(aw, ah, image.getType());
-                reImage.createGraphics().drawImage(image.getScaledInstance(aw, ah, Image.SCALE_AREA_AVERAGING), 0, 0, aw, ah, null);
-                for (int y = 0; y < reImage.getHeight(); y++) {
-                    for (int x = 0; x < reImage.getWidth(); x++) {
-                        int c = reImage.getRGB(x, y);
-                        ColorPallet pallet = ColorPallet.getColorByColorCode(c);
-                        if (!colors.containsKey(pallet))
-                            colors.put(pallet, new ArrayList<>());
-                        colors.get(pallet).add(new Pos(x, y));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        // File pictuer = new File("D:\\Pictures\\DropBox\\avatar.jpg");
+        URL url = new URL("https://cdn.discordapp.com/attachments/608914022883917824/861174644823687198/fcoh.png");
+        try {
+            BufferedImage image = ImageIO.read(getStream(url));
+            int size = campush;
+            float w = image.getWidth();
+            float h = image.getHeight();
+            int aw = size;
+            int ah = size;
+            if (w == h) {
+                aw = size;
+                ah = size;
+            } else if (w > h) {
+                aw = size;
+                ah = (int) ((float) size * (h / w));
+            } else if (w > h) {
+                aw = (int) ((float) size * (w / h));
+                ah = size;
             }
+            BufferedImage reImage = new BufferedImage(aw, ah, image.getType());
+            reImage.createGraphics().drawImage(image.getScaledInstance(aw, ah, Image.SCALE_AREA_AVERAGING), 0, 0, aw, ah, null);
+            for (int y = 0; y < reImage.getHeight(); y++) {
+                for (int x = 0; x < reImage.getWidth(); x++) {
+                    int c = reImage.getRGB(x, y);
+                    ColorPallet pallet = ColorPallet.getColorByColorCode(c);
+                    if (!colors.containsKey(pallet))
+                        colors.put(pallet, new ArrayList<>());
+                    colors.get(pallet).add(new Pos(x, y));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         System.out.println("描画開始");
         try {
@@ -239,5 +239,9 @@ public class Main {
             }
         }
     }
-
+    public static InputStream getStream(URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.addRequestProperty("user-agent", USER_AGENT);
+        return connection.getInputStream();
+    }
 }
